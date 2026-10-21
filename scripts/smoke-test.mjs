@@ -1,0 +1,103 @@
+import { chromium, expect } from '@playwright/test';
+import { mkdir, readdir } from 'node:fs/promises';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+const origin = process.env.QA_ORIGIN || 'http://127.0.0.1:3000';
+const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', headless: true });
+const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true });
+const page = await context.newPage();
+const errors = [];
+page.on('pageerror', e => errors.push(e.message));
+await mkdir('.qa', { recursive: true });
+async function routes(dir = 'out', prefix = '') {
+ const found=[];
+ for(const e of await readdir(dir,{withFileTypes:true})){
+  if(e.isDirectory()&&!['_next','images','fonts'].includes(e.name))found.push(...await routes(path.join(dir,e.name),`${prefix}/${e.name}`));
+  if(e.isFile()&&e.name==='index.html')found.push(prefix||'/');
+ }
+ return found;
+}
+try {
+ const all=await routes();
+ for(const r of all){const res=await context.request.get(`${origin}${r==='/'?'/':r+'/'}`);assert.equal(res.status(),200,r)}
+ console.log(`PASS ${all.length} exported routes return HTTP 200`);
+ await page.goto(origin);
+ await page.getByRole('heading',{name:/Young voices/}).waitFor();
+ await page.evaluate(()=>document.fonts.ready);
+ await page.screenshot({path:'.qa/home-desktop.png',fullPage:true});
+ await page.goto(`${origin}/events/`);
+ await page.getByRole('button',{name:'Climate',exact:true}).click();
+ await expect(page.locator('.event-card')).toHaveCount(1);
+ await page.getByLabel('Filter by location').selectOption('Islamabad');
+ await page.getByRole('heading',{name:'No events found'}).waitFor();
+ console.log('PASS event filters and empty state');
+ await page.goto(`${origin}/blog/`);
+ await page.getByLabel('Search articles').fill('climate');
+ await expect(page.locator('.article-card')).toHaveCount(1);
+ await page.goto(`${origin}/join/`);
+ await page.getByRole('button',{name:'Preview submission'}).click();
+ assert.equal(await page.locator('.success-box').count(),0);
+ await page.getByLabel('Full name').fill('Demo Reviewer');
+ await page.getByLabel('Email address').fill('reviewer@example.com');
+ await page.getByLabel('Phone number').fill('+92 300 1234567');
+ await page.getByLabel('City',{exact:false}).fill('Islamabad');
+ await page.getByLabel('Province / region').selectOption('Islamabad Capital Territory');
+ await page.getByLabel('Area of interest').selectOption('Leadership');
+ await page.getByLabel('What inspires you').fill('Exploring the frontend demonstration.');
+ await page.getByRole('checkbox').check();
+ await page.getByRole('button',{name:'Preview submission'}).click();
+ await page.getByRole('heading',{name:/completed the application preview/}).waitFor();
+ assert.match(await page.locator('.reference').innerText(),/^YCP-DEMO-/);
+ console.log('PASS article search, form validation and submission preview');
+ await page.goto(`${origin}/faq/`);
+ await page.getByRole('button',{name:/Do I need an account/}).click();
+ await page.getByText('The proposed experience lets visitors',{exact:false}).waitFor();
+ await page.goto(`${origin}/gallery/`);
+ await page.getByLabel('Enlarge YCP archive photograph 1').click();
+ await page.getByRole('dialog',{name:'Enlarged photograph'}).waitFor();
+ await page.getByLabel('Close enlarged photograph').press('Escape');
+ assert.equal(await page.locator('.lightbox').count(),0);
+ await page.goto(`${origin}/search/`);
+ await page.getByLabel('Search public content').fill('leadership');
+ assert.ok(await page.locator('.search-results>a').count()>0);
+ console.log('PASS FAQ, gallery, public search');
+ await page.goto(`${origin}/admin/login/`);
+ await page.getByLabel('Preview as').selectOption('Registration Manager');
+ await page.getByRole('button',{name:'Explore dashboard'}).click();
+ await page.waitForURL('**/admin/dashboard/');
+ await page.getByRole('navigation',{name:'Dashboard navigation'}).getByRole('link',{name:/Registrations/}).click();
+ await page.getByLabel('Status for YCP-DEMO-001').selectOption('Approved');
+ await page.reload();
+ await page.waitForFunction(()=>document.querySelector('select[aria-label="Status for YCP-DEMO-001"]')?.value==='Approved');
+ const download=page.waitForEvent('download');
+ await page.getByRole('button',{name:'Export CSV'}).click();
+ assert.equal((await download).suggestedFilename(),'ycp-sample-applications.csv');
+ await page.getByLabel('Preview role').selectOption('Blog Writer');
+ await page.getByRole('heading',{name:'This section belongs to another role.'}).waitFor();
+ assert.equal(await page.getByRole('navigation',{name:'Dashboard navigation'}).getByRole('link',{name:/Registrations/}).count(),0);
+ await page.goto(`${origin}/admin/blog/new/`);
+ await page.getByLabel('Title',{exact:false}).fill('Demo editorial draft');
+ await page.getByLabel('Description').fill('Draft created during the frontend review.');
+ await page.getByRole('button',{name:'Save sample'}).click();
+ await page.getByRole('status').filter({hasText:'Sample changes saved'}).waitFor();
+ assert.equal(await page.locator('select[name="status"] option[value="Published"]').count(),0);
+ await page.getByLabel('Preview role').selectOption('Super Admin');
+ await page.goto(`${origin}/admin/dashboard/`);
+ await page.getByRole('heading',{name:'Registration overview'}).waitFor();
+ await page.screenshot({path:'.qa/dashboard-desktop.png',fullPage:true});
+ console.log('PASS role views, status persistence, CSV export and draft creation');
+ await page.setViewportSize({width:390,height:844});
+ for(const r of ['/','/events/','/join/','/programs/','/leadership/','/gallery/','/admin/dashboard/']){
+  await page.goto(`${origin}${r}`);await page.locator('h1').waitFor();
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1),`Horizontal overflow: ${r}`);
+ }
+ await page.goto(origin);
+ await page.getByLabel('Open navigation',{exact:true}).click();
+ await page.locator('.nav').getByRole('link',{name:'Executive members'}).click();
+ await page.waitForURL('**/members/');
+ await page.goto(origin);
+ await page.screenshot({path:'.qa/home-mobile.png',fullPage:true});
+ console.log('PASS mobile navigation and layout overflow');
+ assert.deepEqual(errors,[],'Browser runtime errors');
+ console.log('PASS no browser runtime errors');
+} finally {await context.close();await browser.close()}
