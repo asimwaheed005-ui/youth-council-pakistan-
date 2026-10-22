@@ -31,6 +31,31 @@ try {
  await page.getByLabel('Filter by location').selectOption('Islamabad');
  await page.getByRole('heading',{name:'No events found'}).waitFor();
  console.log('PASS event filters and empty state');
+ await page.goto(`${origin}/events/domestic/`);
+ await expect(page.locator('.event-card')).toHaveCount(2);
+ await expect(page.locator('.event-conference-feature')).toHaveCount(0);
+ await page.locator('.event-scope-nav').getByRole('link',{name:'International events',exact:true}).click();
+ await expect(page.locator('.event-card')).toHaveCount(1);
+ await expect(page.locator('.event-conference-feature')).toHaveCount(1);
+ await page.getByLabel('Search events').fill('no-such-conference');
+ await page.getByRole('heading',{name:'No events found'}).waitFor();
+ await page.getByRole('button',{name:'Clear filters'}).click();
+ await page.getByRole('link',{name:'Explore conference',exact:true}).click();
+ await expect(page).toHaveURL(/events\/international\/international-youth-dialogue\/$/);
+ await page.locator('.conference-tabs').getByRole('link',{name:/Conference gallery/}).click();
+ await expect(page).toHaveURL(/international-youth-dialogue\/gallery\/$/);
+ await expect(page.locator('.conference-gallery .gallery-photo')).toHaveCount(3);
+ const photo=page.getByLabel('Enlarge conference preview photograph 1');
+ await photo.click();
+ await page.getByRole('dialog',{name:'Enlarged conference photograph'}).waitFor();
+ await page.keyboard.press('Escape');
+ await expect(page.locator('.conference-lightbox')).toHaveCount(0);
+ await expect(photo).toBeFocused();
+ await page.screenshot({path:'.qa/conference-gallery-desktop.png',fullPage:true});
+ await page.goto(`${origin}/conferences/youth-dialogue-preview/`);
+ await page.locator('.conference-tabs').getByRole('link',{name:/Conference gallery/}).click();
+ await expect(page).toHaveURL(/events\/international\/international-youth-dialogue\/gallery\/$/);
+ console.log('PASS domestic/international isolation, conference navigation, gallery and legacy links');
  await page.goto(`${origin}/blog/`);
  await page.getByLabel('Search articles').fill('climate');
  await expect(page.locator('.article-card')).toHaveCount(1);
@@ -87,10 +112,12 @@ try {
  await page.screenshot({path:'.qa/dashboard-desktop.png',fullPage:true});
  console.log('PASS role views, status persistence, CSV export and draft creation');
  await page.setViewportSize({width:390,height:844});
- for(const r of ['/','/events/','/join/','/programs/','/leadership/','/gallery/','/admin/dashboard/']){
+ for(const r of ['/','/events/','/events/domestic/','/events/international/','/events/international/international-youth-dialogue/','/events/international/international-youth-dialogue/gallery/','/join/','/programs/','/leadership/','/gallery/','/admin/dashboard/']){
   await page.goto(`${origin}${r}`);await page.locator('h1').waitFor();
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1),`Horizontal overflow: ${r}`);
  }
+ await page.goto(`${origin}/events/international/international-youth-dialogue/gallery/`);
+ await page.screenshot({path:'.qa/conference-gallery-mobile.png',fullPage:true});
  await page.goto(origin);
  await page.getByLabel('Open navigation',{exact:true}).click();
  await page.locator('.nav').getByRole('link',{name:'Executive members'}).click();

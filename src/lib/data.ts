@@ -5,9 +5,15 @@ export const programs = [
  {slug:"education-research",title:"Education & research",category:"Education",image:"community.jpg",description:"Turn curiosity into informed action through learning, research, and knowledge exchange.",icon:"education"}
 ];
 export const events = [
- {slug:"youth-leadership-dialogue",title:"Youth Leadership Dialogue",category:"Leadership",city:"Islamabad",date:"14",month:"NOV",fullDate:"14 November 2026",format:"In person",image:"leadership.jpg",description:"An illustrative gathering for young people to explore leadership, community participation, and purposeful action."},
- {slug:"climate-action-roundtable",title:"Climate Action Roundtable",category:"Climate",city:"Lahore",date:"21",month:"NOV",fullDate:"21 November 2026",format:"Hybrid",image:"climate.jpg",description:"An illustrative roundtable bringing youth perspectives to climate challenges and local solutions."},
- {slug:"global-youth-connections",title:"Global Youth Connections",category:"Diplomacy",city:"Online",date:"05",month:"DEC",fullDate:"5 December 2026",format:"Online",image:"dialogue.jpg",description:"An illustrative online exchange exploring collaboration, cultural understanding, and youth diplomacy."}
+ {slug:"youth-leadership-dialogue",scope:"domestic",title:"Youth Leadership Dialogue",category:"Leadership",city:"Islamabad",date:"14",month:"NOV",fullDate:"14 November 2026",format:"In person",image:"leadership.jpg",description:"An illustrative gathering for young people to explore leadership, community participation, and purposeful action."},
+ {slug:"climate-action-roundtable",scope:"domestic",title:"Climate Action Roundtable",category:"Climate",city:"Lahore",date:"21",month:"NOV",fullDate:"21 November 2026",format:"Hybrid",image:"climate.jpg",description:"An illustrative roundtable bringing youth perspectives to climate challenges and local solutions."},
+ {slug:"global-youth-connections",scope:"international",title:"Global Youth Connections",category:"Diplomacy",city:"Online",date:"05",month:"DEC",fullDate:"5 December 2026",format:"Online",image:"dialogue.jpg",description:"An illustrative online exchange exploring collaboration, cultural understanding, and youth diplomacy."}
+];
+export const conferencePath="/events/international/international-youth-dialogue";
+export const conferencePhotos=[
+ {image:"dialogue.jpg",title:"Dialogue & exchange",description:"YCP archive image used to preview the conference dialogue album."},
+ {image:"leadership.jpg",title:"Young voices, shared purpose",description:"YCP archive image used to preview the conference community album."},
+ {image:"community.jpg",title:"Connections that matter",description:"YCP archive image used to preview the conference connections album."}
 ];
 export const articles = [
  {slug:"youth-as-agents-of-change",title:"From participants to changemakers: putting youth at the center",category:"Youth development",image:"leadership.jpg",date:"Editorial preview",excerpt:"Exploring how meaningful participation can help young people shape the communities they belong to."},
@@ -17,4 +23,4 @@ export const articles = [
 export const roles = ["Super Admin","Event Manager","Blog Writer","Blog Editor","Registration Manager"];
 export const publicPaths = ["about","leadership","leadership/president","members","representatives","programs","events","gallery","news","blog","blog/category/climate","conferences","impact","media","join","contact","faq","search","privacy","terms",...programs.map(x=>`programs/${x.slug}`),...events.flatMap(x=>[`events/${x.slug}`,`events/${x.slug}/register`]),...articles.flatMap(x=>[`blog/${x.slug}`,`news/${x.slug}`]),"gallery/ycp-in-focus","conferences/youth-dialogue-preview"];
 export const adminSections=["dashboard","events","programs","registrations","forms","blog","categories","announcements","gallery","conferences","leaders","representatives","impact","notifications","analytics","users","roles","audit-logs","settings"];
-export const paths=[...publicPaths,"admin/login",...adminSections.map(x=>`admin/${x}`),"admin/events/new","admin/blog/new","admin/forms/new","admin/events/sample/edit","admin/blog/sample/edit","admin/forms/sample/edit","admin/registrations/YCP-DEMO-001"];
+export const paths=[...publicPaths,"events/domestic","events/international",conferencePath.slice(1),`${conferencePath.slice(1)}/gallery`,"admin/login",...adminSections.map(x=>`admin/${x}`),"admin/events/new","admin/blog/new","admin/forms/new","admin/events/sample/edit","admin/blog/sample/edit","admin/forms/sample/edit","admin/registrations/YCP-DEMO-001"];

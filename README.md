@@ -45,3 +45,7 @@ With the exported site running on port 3000, run `npm run test:smoke`. The test 
 ## Backend remains
 
 Database/content APIs, real authentication, server-side authorization, immutable form versions, persistent submissions, uploads, email, live analytics, approved articles, WordPress migration/redirects, backups, and production policies are later phases.
+
+## Event structure
+
+Events now includes dedicated `/events/domestic/` and `/events/international/` listings. International Youth Dialogue has an overview at `/events/international/international-youth-dialogue/` and a separate `/gallery/` subpage beneath it. The original conference URLs remain supported. Conference gallery images are explicitly labelled archive previews pending verified conference photography.
