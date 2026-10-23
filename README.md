@@ -30,13 +30,13 @@ Interactions include event/article filters, search, validated application/contac
 
 One portal supports Super Admin, Event Manager, Blog Writer, Blog Editor, and Registration Manager. Selection changes sidebar navigation and section visibility. Explore application review, sample status changes, CSV export, content drafts, and a basic form-field builder.
 
-There is **no authentication or secure authorization**. Roles are intentionally selectable. Selected role, sample content title/status records, and application statuses use browser localStorage. Generic module lists last until leaving the page. Public content comes from fixed fixtures: admin edits do not update public pages. Editor description/date/category fields demonstrate the UI and are not persisted. Form definitions are not connected to public application forms.
+There is **no authentication or secure authorization**. Roles are intentionally selectable. Selected role, sample content title/status records, and application statuses use browser localStorage. Generic module lists last until leaving the page. Public content comes from locally imported WordPress records: admin edits do not update public pages. Editor description/date/category fields demonstrate the UI and are not persisted. Form definitions are not connected to public application forms.
 
 Public form entries remain in memory and are not saved, sent, or emailed. Reference numbers are demonstrations. Do not enter real applicant information.
 
 ## Content and assets
 
-Logo and archive photographs come from the existing youthcouncil.pk website and are stored in `public/images`. The organization description, president’s name, and message excerpt are grounded in its public content. Program copy requires review. Future events/dates, conference examples, articles, applicant records, and counts are labelled samples. Unverified member profiles and statistics have not been invented. Policies are draft preview notices. Fonts are local.
+Logo and archive photographs come from the existing youthcouncil.pk website and are stored in `public/images`. The organization description, president’s name, and message excerpt are grounded in its public content. Public WordPress content has been migrated: 13 pages, 17 full posts, 283 media originals, categories/tags, FAQs, the president?s complete message, contact details, and the membership field definitions. Event reports distinguish event dates from publication dates. Applicant records and staff dashboard counts remain labelled samples. Unverified member profiles and statistics have not been invented. See WORDPRESS-MIGRATION.md for page mappings, source gaps and verification. Policies are draft preview notices. Fonts are local.
 
 ## Browser verification
 
@@ -44,8 +44,10 @@ With the exported site running on port 3000, run `npm run test:smoke`. The test 
 
 ## Backend remains
 
-Database/content APIs, real authentication, server-side authorization, immutable form versions, persistent submissions, uploads, email, live analytics, approved articles, WordPress migration/redirects, backups, and production policies are later phases.
+Database/content APIs, real authentication, server-side authorization, immutable form versions, persistent submissions, uploads, email, live analytics, private WordPress data migration, production HTTP redirects, backups, and production policies are later phases.
 
 ## Event structure
 
-Events now includes dedicated `/events/domestic/` and `/events/international/` listings. International Youth Dialogue has an overview at `/events/international/international-youth-dialogue/` and a separate `/gallery/` subpage beneath it. The original conference URLs remain supported. Conference gallery images are explicitly labelled archive previews pending verified conference photography.
+Events includes `/events/domestic/` and `/events/international/`. Each imported event has an overview at `/events/<scope>/<slug>/` and a separate `/gallery/` subpage. The featured conference is the published 9th Asia-Pacific Climate Change Adaptation Forum, replacing the fictional International Youth Dialogue sample. Original public conference preview links remain usable.
+
+See `LEGACY-EVENT-MIGRATION.md` for the import inventory and source links, and `IMAGE-GUIDE.md` for photo folders and records. The generated archive is `src/lib/legacy-events.json`. Run `python scripts/import-legacy-events.py --refresh` to refresh the public WordPress source after reviewing its scope/date mapping. Past events do not offer registration. Missing source details remain unstated.
