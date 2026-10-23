@@ -33,7 +33,9 @@ Source: https://youthcouncil.pk/ and its paginated public WordPress REST API. Im
 
 Every imported record also has a complete readable source version at `/source-archive/<original-slug>/`, indexed by `/source-archive/`. Posts have `/blog/<original-slug>/` and `/news/<original-slug>/` routes; original root post URLs remain usable. Category and tag archives are generated from WordPress records. Former sample article URLs now open relevant published articles. Source archive and unverified/plugin pages are marked noindex. Relative canonical links identify primary pages.
 
-`/media/` provides search, pagination and downloads for the 283 available media files. All internal source links recognized as imported pages, posts or category archives resolve locally. Unknown external destinations retain their original URL.
+`/media/` provides search, pagination and downloads for the 283 available media files. Links to copied pages, posts, categories, tags and available media resolve locally. Unmatched links to the former website are displayed without outbound navigation. Other external destinations, including organizational social profiles and the online membership form, retain their original URL.
+
+Visitor-facing source credits, references to the former website, and the footer's original-website archive link have been removed. Archive pages use neutral YCP publication labels. Source URLs remain internal migration metadata only. `python scripts/check-site-references.py` audits every exported HTML file for old-site hyperlinks and visible references; browser verification also checks every media-library page.
 
 ## Known source gaps and unavailable private data
 

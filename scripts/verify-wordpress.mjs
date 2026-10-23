@@ -39,7 +39,7 @@ try{
  for(const section of imported.config.membershipSections){
   for(const field of section.fields)assert.ok(await page.locator(`[name="${field.name}"]`).count()>0,field.label);
  }
- await expect(page.getByRole('link',{name:'Apply using YCP’s current form'})).toHaveAttribute('href',imported.config.membershipUrl);
+ await expect(page.getByRole('link',{name:'Apply online'})).toHaveAttribute('href',imported.config.membershipUrl);
  console.log(`PASS all ${report.membershipFields} membership fields and current application link`);
  await page.goto(`${origin}/faq/`);
  for(const faq of imported.config.faqs)await expect(page.getByRole('button',{name:faq.q,exact:true})).toBeVisible();
@@ -51,6 +51,13 @@ try{
  await expect(page.locator('.migrated-media-grid figure')).toHaveCount(24);
  await page.getByRole('button',{name:'Show more assets'}).click();
  await expect(page.locator('.migrated-media-grid figure')).toHaveCount(48);
+ while(await page.getByRole('button',{name:'Show more assets'}).count()){
+  const before=await page.locator('.migrated-media-grid figure').count();
+  await page.getByRole('button',{name:'Show more assets'}).click();
+  await expect(page.locator('.migrated-media-grid figure')).toHaveCount(Math.min(before+24,report.downloadedAssets));
+ }
+ assert.doesNotMatch(await page.locator('main').innerText(),/\bWordPress\b|(?:original|previous|existing|old)\s+(?:YCP\s+)?website|https?:\/\/(?:www\.)?youthcouncil\.pk/i);
+ assert.equal(await page.locator('main a[href^="https://youthcouncil.pk"],main a[href^="http://youthcouncil.pk"]').count(),0);
  await page.getByLabel('Search media library',{exact:true}).fill('no-such-media-asset-123');
  await expect(page.getByText('No media match this search.')).toBeVisible();
  await page.goto(`${origin}/blog/category/climate-change/`);

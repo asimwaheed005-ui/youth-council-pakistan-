@@ -70,7 +70,7 @@ try {
   const url=`${origin}/events/${event.scope}/${event.slug}/`;
   await page.goto(url);
   await page.getByRole('heading',{level:1,name:event.title,exact:true}).waitFor();
-  await expect(page.getByRole('link',{name:'Original YCP source',exact:true})).toHaveAttribute('href',event.sourceUrl);
+  await expect(page.locator('a[href^="https://youthcouncil.pk"]')).toHaveCount(0);
   assert.equal(await page.locator('.legacy-report-paragraph').count(),event.paragraphs.length);
   assert.equal(await page.getByRole('link',{name:'Preview registration',exact:true}).count(),0);
  }
@@ -86,7 +86,7 @@ try {
  await expect(page.locator('.migrated-membership>fieldset')).toHaveCount(5);
  await page.getByRole('button',{name:'Preview submission'}).click();
  await page.getByRole('heading',{name:/completed the application preview/}).waitFor();
- await expect(page.getByRole('link',{name:'Open current application form'})).toHaveAttribute('href',wordpress.config.membershipUrl);
+ await expect(page.getByRole('link',{name:'Apply online'})).toHaveAttribute('href',wordpress.config.membershipUrl);
  console.log('PASS article search, form validation and submission preview');
  await page.goto(`${origin}/faq/`);
  await page.getByRole('button',{name:'Does YCP collaborate with other organizations?'}).click();
