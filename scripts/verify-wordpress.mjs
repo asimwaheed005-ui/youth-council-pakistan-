@@ -12,6 +12,9 @@ try{
  assert.equal(imported.documents.filter(d=>d.kind==='post').length,report.posts);
  assert.equal(imported.documents.filter(d=>d.kind==='page').length,report.pages);
  for(const doc of imported.documents){
+  for(const src of [doc.image,...doc.blocks.filter(b=>b.type==='image').map(b=>b.src)].filter(Boolean)){
+   assert.ok((await stat(`public${src}`)).size>0,`${doc.slug}: missing image ${src}`);
+  }
   await page.goto(`${origin}/source-archive/${doc.slug}/`);
   await expect(page.getByRole('heading',{level:1})).toHaveText(doc.title);
   const text=normalize(await page.locator('main article').innerText());

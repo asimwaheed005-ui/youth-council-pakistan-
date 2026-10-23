@@ -161,7 +161,8 @@ def run():
                 unique.append(block);seen.add(signature)
         is_post=record in posts
         title=plain(record['title']['rendered'])
-        image=next((a['src'] for a in assets if a['id']==record.get('featured_media')), '')
+        featured_id=record.get('featured_media')
+        image=next((a['src'] for a in assets if featured_id and a['id']==featured_id and a['available']), '')
         if not image:
             image=next((b['src'] for b in unique if b['type']=='image'),'')
         cats=[category_map[c] for c in record.get('categories',[]) if c in category_map]
